@@ -1,7 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Pipeline
+name: Build and Test Cookbook App
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build_test:
 
     runs-on: ubuntu-latest
 
@@ -28,3 +28,24 @@ jobs:
       run: npm run test:unit
     - name: Diplay softuni username
       run: echo "adelinaborisova1992"
+
+  run-ui-tests:
+    needs: build_test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+        cache: 'npm'
+    - name: Install NPM dependencies
+      run: npm install
+    - name: Install Playwright browsers
+      run: npx playwright install
+    - name: Start the application
+      run: npm run start &
+    - name: Run unit tests
+      run: npm run test:ui
